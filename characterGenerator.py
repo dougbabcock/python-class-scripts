@@ -111,8 +111,12 @@ def battle(character, enemy):
         print(f"{enemy['name']} goes first!")
         first = enemy
         second = character
-    first_potions = 2
-    second_potions = 2
+
+    # Initialize hit points and potions
+    first['hit_points'] = first['max_hit_points']
+    second['hit_points'] = second['max_hit_points']
+    first_potions = roll(2)
+    second_potions = roll(2)
     round = 1
 
     while character['hit_points'] > 0 and enemy['hit_points'] > 0:
@@ -120,7 +124,7 @@ def battle(character, enemy):
         print("=" * 46)
         print(f"           ⚔️    ROUND {round}   ⚔️               ")
         print("=" * 46)
-        print(f"{character['name']}      vs {enemy['name']} ")
+        print(f"{character['name']} vs {enemy['name']} ")
         print(f"HP: {character['hit_points']}/{character['max_hit_points']}           HP: {enemy['hit_points']}/{enemy['max_hit_points']}")
         print()
 
@@ -128,19 +132,20 @@ def battle(character, enemy):
         if first['hit_points'] < first['max_hit_points'] and random.choice([True, False]) and first_potions > 0:
             first = use_potion(first)
             first_potions -= 1
-            print(f"{first['name']} uses a potion and regains some health!")
+            print(f"🧪 {first['name']} uses a potion and regains some health!")
         # If we don't use a potion, we attack
         else:
             d20 = roll(20)
             damage = calculate_damage(first, second, d20)
-            print(f"{first['name']} rolls a {d20} for the attack!")
+            print(f"🎲 {first['name']} rolls a {d20} for the attack!")
             if damage == 0:
                 print("The attack missed!")
             else:
                 second['hit_points'] -= damage
-                print(f"{first['name']} hits {second['name']} for {damage} damage!")
+                print(f"💥 {second['name']} takes {damage} damage")
                 if second['hit_points'] <= 0:
-                    print(f"{second['name']} has been defeated!")
+                    print()
+                    print(f"💀 {second['name']} has been defeated!")
                     break
         print()
 
@@ -148,18 +153,19 @@ def battle(character, enemy):
         if second['hit_points'] < second['max_hit_points'] and random.choice([True, False]) and second_potions > 0:
             second = use_potion(second)
             second_potions -= 1
-            print(f"{second['name']} uses a potion and regains some health!")
+            print(f"🧪 {second['name']} uses a potion and regains some health!")
         else:
             d20 = roll(20)
-            print(f"{first['name']} rolls a {d20} for the attack!")
+            print(f"🎲 {second['name']} rolls a {d20} for the attack!")
             damage = calculate_damage(second, first, d20)
             if damage == 0:
                 print(f"{second['name']} misses {first['name']}!")
             else:
                 first['hit_points'] -= damage
-                print(f"{second['name']} hits {first['name']} for {damage} damage!")
+                print(f"💥 {first['name']} takes {damage} damage")
                 if first['hit_points'] <= 0:
-                    print(f"{first['name']} has been defeated!")
+                    print()
+                    print(f"💀 {first['name']} has been defeated!")
                     break
         print()
         round += 1
@@ -256,19 +262,22 @@ def main():
         print()
         print("Your character:")
         print_character(character)
-        enemy = generate_character(random.choice(enemy_names))
         print()
-        if not getyesno("Do you accept this character? "):
+        fight = getyesno("Do you accept this character? ")
+        if not fight:
             print("Generating a new character...")
             print()
             continue
-        print()
-        print("You are walking through the forest when you encounter a " + enemy['name'] + "!")
-        print_character(enemy)
-        print()
-        input("There's no way out! Press enter to begin the battle...")
-        battle(character, enemy)
-
+        while fight:
+            enemy = generate_character(random.choice(enemy_names))
+            print()
+            print("You are walking through the forest when you encounter a " + enemy['name'] + "!")
+            print_character(enemy)
+            print()
+            input("There's no way out! Press enter to begin the battle...")
+            battle(character, enemy)
+            print()
+            fight = getyesno("Do you want to fight another enemy? ")
         play = getyesno("Would you like to create a different character? ")
 
 if __name__ == "__main__":
